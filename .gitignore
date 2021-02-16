@@ -118,6 +118,8 @@ env.bak/
 venv.bak/
 pythonenv*
 
+!riddbot/env/
+
 # Spyder project settings
 .spyderproject
 .spyproject
