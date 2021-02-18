@@ -3,6 +3,8 @@ import pybullet as p
 from assistive_gym.envs.env import AssistiveEnv
 from assistive_gym.envs.agents.furniture import Furniture
 
+from riddbot.agents.disposal import DisposalBowl
+
 
 __all__ = [
     "setup_bed",
@@ -108,6 +110,16 @@ def setup_sanitation_stand(env: AssistiveEnv):
     env.sanitation_stand.set_base_pos_orient(
         env.robot_base_position + np.array([-0.9, 0.1, 0]), [0, 0, 0, 1]
     )
+
+    env.disposal_bowl = DisposalBowl()
+    env.disposal_bowl.init(
+        env=env, base_pos=env.robot_base_position + np.array([-0.9, 0.1, 2])
+    )
+
+    # Let the disposal bowl settle on the sanitation stand
+    p.setGravity(0, 0, -1, physicsClientId=env.id)
+    for _ in range(300):
+        p.stepSimulation(physicsClientId=env.id)
 
 
 def setup_gravity(env: AssistiveEnv):
