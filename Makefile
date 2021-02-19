@@ -19,10 +19,10 @@ $(POETRY):
 poetry: $(POETRY)
 	$(POETRY) $(ARGS)
 
-poetry.lock: $(POETRY) pyproject.toml
+poetry.lock: pyproject.toml | $(POETRY)
 	$(POETRY) lock
 
-.venv: $(POETRY) poetry.lock
+.venv: poetry.lock | $(POETRY)
 	$(POETRY) install
 	touch $@
 
