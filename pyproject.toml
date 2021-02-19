@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "riddbot"
+version = "0.0.0"
+description = "Robotic Intervention for Dirty Disposal"
+authors = ["Reine Bassong", "Nilaksh Das", "Shreyans D Mehta", "Diya P Mitra", "David N Williams"]
+
+
+[tool.poetry.dependencies]
+python = "3.6"
+assistive_gym = {git = "https://github.com/Healthcare-Robotics/assistive-gym.git", branch = "main"}
+numpngw = "0.0.8"
+
+
+[tool.poetry.dev-dependencies]
+jupyterlab = "1.2.6"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

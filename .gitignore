@@ -118,8 +118,6 @@ env.bak/
 venv.bak/
 pythonenv*
 
-!riddbot/env/
-
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -145,3 +143,5 @@ dmypy.json
 .prof
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+!riddbot/env/
