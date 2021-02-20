@@ -62,8 +62,8 @@ class BedPanEnv(AssistiveEnv):
 
         setup_bed(self)
         setup_patient(self)
-        setup_robot(self)
         setup_bedpan(self)
+        setup_robot(self)
         setup_sanitation_stand(self)
 
         self.generate_targets()

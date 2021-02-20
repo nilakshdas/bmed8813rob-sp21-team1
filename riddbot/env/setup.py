@@ -4,6 +4,7 @@ import pybullet as p
 from assistive_gym.envs.env import AssistiveEnv
 from assistive_gym.envs.agents.furniture import Furniture
 
+from riddbot.agents.bedpan import Bedpan
 from riddbot.agents.disposal import DisposalBowl
 
 
@@ -45,6 +46,19 @@ def setup_patient(env: AssistiveEnv):
     )
     env.human.set_mass(env.human.base, mass=0)
     env.human.set_base_velocity(linear_velocity=[0, 0, 0], angular_velocity=[0, 0, 0])
+
+
+def setup_bedpan(env: AssistiveEnv):
+    human_waist_pos = env.human.get_pos_orient(env.human.waist)[0]
+    bedpan_pos = human_waist_pos + np.array([-0.4, -0.2, 2.0])
+
+    env.bedpan = Bedpan()
+    env.bedpan.init(env=env, base_pos=bedpan_pos)
+
+    # Let the bedpan settle on the bed
+    p.setGravity(0, 0, -1, physicsClientId=env.id)
+    for _ in range(100):
+        p.stepSimulation(physicsClientId=env.id)
 
 
 def setup_robot(env: AssistiveEnv):
@@ -93,10 +107,6 @@ def setup_robot(env: AssistiveEnv):
         env.robot.gripper_pos[env.task],
         set_instantly=True,
     )
-
-
-def setup_bedpan(env: AssistiveEnv):
-    pass
 
 
 def setup_sanitation_stand(env: AssistiveEnv):
