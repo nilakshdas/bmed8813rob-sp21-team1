@@ -1,3 +1,4 @@
+import gym
 import numpy as np
 import pybullet as p
 from assistive_gym.envs.env import AssistiveEnv
@@ -128,3 +129,13 @@ def setup_gravity(env: AssistiveEnv):
         env.robot.set_gravity(0, 0, 0)
     env.human.set_gravity(0, 0, -1)
     env.tool.set_gravity(0, 0, 0)
+
+
+def setup_camera(env: gym.Env):
+    env.setup_camera(
+        fov=60,
+        camera_eye=[-2.0, -0.5, 1.5],
+        camera_target=[-0.5, 0, 0.75],
+        camera_width=1920 // 4,
+        camera_height=1080 // 4,
+    )

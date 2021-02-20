@@ -9,6 +9,7 @@ from gym.envs.registration import register as register_gym
 from ray.tune.registry import register_env as register_ray
 
 from riddbot.env.bedpan_env import BedPanEnv
+from riddbot.env.setup import setup_camera
 
 ROBOT_ARM = "right"
 HUMAN_CONTROLLABLE_JOINT_INDICES = human.right_arm_joints
@@ -20,16 +21,6 @@ class BedPanJacoEnv(BedPanEnv):
             robot=Jaco(ROBOT_ARM),
             human=Human(HUMAN_CONTROLLABLE_JOINT_INDICES, controllable=False),
         )
-
-
-def setup_camera(env: gym.Env):
-    env.setup_camera(
-        fov=60,
-        camera_eye=[-2.0, -0.5, 1.5],
-        camera_target=[-0.5, 0, 0.75],
-        camera_width=1920 // 4,
-        camera_height=1080 // 4,
-    )
 
 
 def make_env() -> Tuple[str, gym.Env]:
