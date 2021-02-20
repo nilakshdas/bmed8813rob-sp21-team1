@@ -110,20 +110,20 @@ def setup_robot(env: AssistiveEnv):
 
 
 def setup_sanitation_stand(env: AssistiveEnv):
+    robot_base_position = env.robot_base_position
+    sanitation_stand_pos = robot_base_position + np.array([-0.9, 0.1, 0])
+    disposal_bowl_pos = sanitation_stand_pos + np.array([0, 0, 0.8])
+
     env.sanitation_stand = Furniture()
     env.sanitation_stand.init("nightstand", env.directory, env.id, env.np_random)
-    env.sanitation_stand.set_base_pos_orient(
-        env.robot_base_position + np.array([-0.9, 0.1, 0]), [0, 0, 0, 1]
-    )
+    env.sanitation_stand.set_base_pos_orient(sanitation_stand_pos, [0, 0, 0, 1])
 
     env.disposal_bowl = DisposalBowl()
-    env.disposal_bowl.init(
-        env=env, base_pos=env.robot_base_position + np.array([-0.9, 0.1, 2])
-    )
+    env.disposal_bowl.init(env=env, base_pos=disposal_bowl_pos)
 
     # Let the disposal bowl settle on the sanitation stand
     p.setGravity(0, 0, -1, physicsClientId=env.id)
-    for _ in range(300):
+    for _ in range(100):
         p.stepSimulation(physicsClientId=env.id)
 
 
