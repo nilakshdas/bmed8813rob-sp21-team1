@@ -74,19 +74,15 @@ def setup_robot(env: AssistiveEnv):
     )
 
     # Initialize robot pose, get base position
-    human_shoulder_pos = env.human.get_pos_orient(env.human.right_shoulder)[0]
-    human_elbow_pos = env.human.get_pos_orient(env.human.right_elbow)[0]
-    human_wrist_pos = env.human.get_pos_orient(env.human.right_wrist)[0]
-
-    target_ee_pos = np.array([-0.6, 0.2, 1])
-    target_ee_pos += env.np_random.uniform(-0.05, 0.05, size=3)
+    target_ee_pos = np.array([-0.4, -0.2, 1.1])
     target_ee_orient = env.get_quaternion(env.robot.toc_ee_orient_rpy[env.task])
+    bedpan_pos = env.bedpan.get_pos_orient(env.bedpan.base)[0]
 
     env.robot_base_position = env.init_robot_pose(
         target_ee_pos,
         target_ee_orient,
         [(target_ee_pos, target_ee_orient)],
-        [(human_shoulder_pos, None), (human_elbow_pos, None), (human_wrist_pos, None)],
+        [(bedpan_pos, None)],
         arm="left",
         tools=[env.tool],
         collision_objects=[env.human, env.furniture],

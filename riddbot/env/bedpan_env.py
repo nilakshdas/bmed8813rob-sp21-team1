@@ -60,6 +60,7 @@ class BedPanEnv(AssistiveEnv):
     def reset(self):
         super().reset()
 
+        # order of the setup calls DOES MATTER
         setup_bed(self)
         setup_patient(self)
         setup_bedpan(self)
