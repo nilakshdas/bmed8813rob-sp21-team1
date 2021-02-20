@@ -33,3 +33,7 @@ relock_poetry:
 
 .PHONY: python_deps
 python_deps: .venv
+
+.PHONY: jupyterlab
+jupyterlab:
+	$(POETRY) run jupyter lab
