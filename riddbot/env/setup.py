@@ -28,13 +28,7 @@ def setup_patient(env: AssistiveEnv):
     env.human.setup_joints(
         joints_positions, use_static_joints=False, reactive_force=None
     )
-    env.human.set_base_pos_orient([-0.15, 0.2, 0.95], [-np.pi / 2.0, 0, 0])
-
-    # Add small variation in human joint positions
-    motor_indices, *_ = env.human.get_motor_joint_states()
-    env.human.set_joint_angles(
-        motor_indices, env.np_random.uniform(-0.1, 0.1, size=len(motor_indices))
-    )
+    env.human.set_base_pos_orient([0.05, 0.2, 0.95], [-np.pi / 2.0, np.pi / 2.0, 0])
 
     # Let the person settle on the bed
     p.setGravity(0, 0, -1, physicsClientId=env.id)
