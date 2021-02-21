@@ -67,8 +67,6 @@ class BedPanEnv(AssistiveEnv):
         setup_robot(self)
         setup_sanitation_stand(self)
 
-        self.generate_targets()
-
         setup_gravity(self)
 
         # Enable rendering
@@ -119,10 +117,6 @@ class BedPanEnv(AssistiveEnv):
 
         info = {
             "total_force_on_human": self.total_force_on_human,
-            "task_success": int(
-                self.task_success
-                >= (self.total_target_count * self.config("task_success_threshold"))
-            ),
             "action_robot_len": self.action_robot_len,
             "action_human_len": self.action_human_len,
             "obs_robot_len": self.obs_robot_len,
@@ -132,97 +126,3 @@ class BedPanEnv(AssistiveEnv):
         done = self.iteration >= 200
 
         return obs, reward, done, info
-
-    def generate_targets(self):
-        self.target_indices_to_ignore = []
-        if self.human.gender == "male":
-            self.upperarm, self.upperarm_length, self.upperarm_radius = (
-                self.human.right_shoulder,
-                0.279,
-                0.043,
-            )
-            self.forearm, self.forearm_length, self.forearm_radius = (
-                self.human.right_elbow,
-                0.257,
-                0.033,
-            )
-        else:
-            self.upperarm, self.upperarm_length, self.upperarm_radius = (
-                self.human.right_shoulder,
-                0.264,
-                0.0355,
-            )
-            self.forearm, self.forearm_length, self.forearm_radius = (
-                self.human.right_elbow,
-                0.234,
-                0.027,
-            )
-
-        self.targets_pos_on_upperarm = self.util.capsule_points(
-            p1=np.array([0, 0, 0]),
-            p2=np.array([0, 0, -self.upperarm_length]),
-            radius=self.upperarm_radius,
-            distance_between_points=0.03,
-        )
-        self.targets_pos_on_forearm = self.util.capsule_points(
-            p1=np.array([0, 0, 0]),
-            p2=np.array([0, 0, -self.forearm_length]),
-            radius=self.forearm_radius,
-            distance_between_points=0.03,
-        )
-
-        self.targets_upperarm = self.create_spheres(
-            radius=0.01,
-            mass=0.0,
-            batch_positions=[[0, 0, 0]] * len(self.targets_pos_on_upperarm),
-            visual=True,
-            collision=False,
-            rgba=[0, 1, 1, 1],
-        )
-        self.targets_forearm = self.create_spheres(
-            radius=0.01,
-            mass=0.0,
-            batch_positions=[[0, 0, 0]] * len(self.targets_pos_on_forearm),
-            visual=True,
-            collision=False,
-            rgba=[0, 1, 1, 1],
-        )
-        self.total_target_count = len(self.targets_pos_on_upperarm) + len(
-            self.targets_pos_on_forearm
-        )
-        self.update_targets()
-
-    def update_targets(self):
-        upperarm_pos, upperarm_orient = self.human.get_pos_orient(self.upperarm)
-        self.targets_pos_upperarm_world = []
-        for target_pos_on_arm, target in zip(
-            self.targets_pos_on_upperarm, self.targets_upperarm
-        ):
-            target_pos = np.array(
-                p.multiplyTransforms(
-                    upperarm_pos,
-                    upperarm_orient,
-                    target_pos_on_arm,
-                    [0, 0, 0, 1],
-                    physicsClientId=self.id,
-                )[0]
-            )
-            self.targets_pos_upperarm_world.append(target_pos)
-            target.set_base_pos_orient(target_pos, [0, 0, 0, 1])
-
-        forearm_pos, forearm_orient = self.human.get_pos_orient(self.forearm)
-        self.targets_pos_forearm_world = []
-        for target_pos_on_arm, target in zip(
-            self.targets_pos_on_forearm, self.targets_forearm
-        ):
-            target_pos = np.array(
-                p.multiplyTransforms(
-                    forearm_pos,
-                    forearm_orient,
-                    target_pos_on_arm,
-                    [0, 0, 0, 1],
-                    physicsClientId=self.id,
-                )[0]
-            )
-            self.targets_pos_forearm_world.append(target_pos)
-            target.set_base_pos_orient(target_pos, [0, 0, 0, 1])
