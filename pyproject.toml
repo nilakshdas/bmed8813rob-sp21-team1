@@ -6,13 +6,14 @@ authors = ["Reine Bassong", "Nilaksh Das", "Shreyans D Mehta", "Diya P Mitra", "
 
 
 [tool.poetry.dependencies]
-python = "3.6"
+python = "~3.6"
 assistive_gym = {git = "https://github.com/Healthcare-Robotics/assistive-gym.git", branch = "main"}
 numpngw = "0.0.8"
 
 
 [tool.poetry.dev-dependencies]
-jupyterlab = "1.2.6"
+black = "20.8b1"
+jupyterlab = "^1.2.6"
 
 
 [build-system]

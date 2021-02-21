@@ -1,16 +1,21 @@
-SUPPORTED_PYTHON_VERSION ?= 3.6
-CURRENT_PYTHON_VERSION = $(shell python -c "import sys; print('%d.%d' % sys.version_info[0:2]);")
+CURRENT_PYTHON_VERSION = $(shell python -V)
+SUPPORTED_PYTHON_VERSION = $(shell echo "Python" | cat - .python-version)
 
 ifneq ($(CURRENT_PYTHON_VERSION),$(SUPPORTED_PYTHON_VERSION))
   $(error "Supported python version is $(SUPPORTED_PYTHON_VERSION), current version is $(CURRENT_PYTHON_VERSION)")
 endif
 
+
 POETRY = $(HOME)/.poetry/bin/poetry
 
 
+.PHONY: clean_python
+clean_python:
+	rm -rfv **/__pycache__
+	rm -rfv **/.ipynb_checkpoints
+
 .PHONY: clean
-clean:
-	rm -rf .venv
+clean: clean_python clean_poetry
 
 $(POETRY):
 	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
@@ -24,16 +29,23 @@ poetry.lock: pyproject.toml | $(POETRY)
 
 .venv: poetry.lock | $(POETRY)
 	$(POETRY) install
-	touch $@
-
-.PHONY: relock_poetry
-relock_poetry:
-	rm -f poetry.lock
-	$(MAKE) poetry.lock
 
 .PHONY: python_deps
 python_deps: .venv
 
+.PHONY: clean_poetry
+clean_poetry:
+	rm -rf .venv
+	rm -f poetry.lock
+
+.PHONY: lint_check
+lint_check: | .venv
+	$(POETRY) run black --check .
+
+.PHONY: lint
+lint: | .venv
+	$(POETRY) run black .
+
 .PHONY: jupyterlab
-jupyterlab:
+jupyterlab: | .venv
 	$(POETRY) run jupyter lab
