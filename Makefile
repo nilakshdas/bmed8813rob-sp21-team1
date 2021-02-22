@@ -1,11 +1,3 @@
-CURRENT_PYTHON_VERSION = $(shell python -V)
-SUPPORTED_PYTHON_VERSION = $(shell echo "Python" | cat - .python-version)
-
-ifneq ($(CURRENT_PYTHON_VERSION),$(SUPPORTED_PYTHON_VERSION))
-  $(error "Supported python version is $(SUPPORTED_PYTHON_VERSION), current version is $(CURRENT_PYTHON_VERSION)")
-endif
-
-
 JQ = jq --indent 4 -r
 PYENV_ROOT = $(HOME)/.pyenv
 POETRY = $(HOME)/.poetry/bin/poetry
