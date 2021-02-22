@@ -35,6 +35,9 @@ def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
     return dict(
         robot_action=np.linalg.norm(action),
         bedpan_disorient=np.linalg.norm(bedpan_orient - np.array([0, 0, 0, 1])),
+        distance_bedpan_disposal=min(
+            env.bedpan.get_closest_points(env.disposal_bowl)[-1]
+        ),
     )
 
 
@@ -47,5 +50,6 @@ def get_sanitation_rewards(env: AssistiveEnv) -> dict:
     return dict(
         disposal_bowl_pos_perturbed=disposal_bowl_pos_perturbed,
         disposal_bowl_orient_perturbed=disposal_bowl_orient_perturbed,
+        water_in_bedpan=sum(w.is_inside_bedpan for w in env.waters),
         water_in_sanitation_bowl=sum(w.is_inside_disposal_bowl for w in env.waters),
     )
