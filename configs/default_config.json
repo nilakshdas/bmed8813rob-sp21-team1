@@ -1,0 +1,5 @@
+{
+    "algo": "ppo",
+    "seed": 42,
+    "train_timesteps": 1000000
+}

@@ -54,3 +54,7 @@ lint: | .venv
 .PHONY: jupyterlab
 jupyterlab: | .venv
 	$(POETRY) run jupyter lab
+
+.PHONY: configs/%.json.train
+configs/%.json.train: configs/%.json
+	$(POETRY) run python bin/train_model.py $<
