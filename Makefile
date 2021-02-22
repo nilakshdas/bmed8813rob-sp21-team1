@@ -31,6 +31,7 @@ poetry.lock: pyproject.toml | $(POETRY)
 .venv: poetry.lock | $(POETRY)
 	$(POETRY) run pip install pip==21.0.1
 	$(POETRY) install -vvv
+	touch $@ # update timestamp
 
 .PHONY: python_deps
 python_deps: .venv
