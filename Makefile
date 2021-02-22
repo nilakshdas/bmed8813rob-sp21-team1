@@ -22,6 +22,10 @@ clean: clean_python clean_poetry
 $(PYENV_ROOT):
 	curl -sSL https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
+.PHONY: pyenv
+pyenv: | $(PYENV_ROOT)
+	pyenv install
+
 $(POETRY):
 	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
