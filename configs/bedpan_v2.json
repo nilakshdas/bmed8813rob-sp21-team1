@@ -11,7 +11,7 @@
         "disposal_bowl_pos_perturbed": -1.5,
         "disposal_bowl_orient_perturbed": -3.0,
         "distance_bedpan_human": 2.0,
-        "distance_bedpan_disposal": 2.0,
+        "distance_bedpan_disposal": -2.0,
         "water_in_bedpan": 5.0,
         "water_in_sanitation_bowl": 20.0
     }

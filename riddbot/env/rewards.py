@@ -32,12 +32,20 @@ def get_human_rewards(env: AssistiveEnv) -> dict:
 def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
     _, bedpan_orient = env.bedpan.get_pos_orient(env.bedpan.base)
 
+    bedpan_to_disposal_thresh = 20.0
+    _, _, _, bedpan_to_disposal_distances = env.bedpan.get_closest_points(
+        env.disposal_bowl, distance=bedpan_to_disposal_thresh
+    )
+    distance_bedpan_disposal = (
+        min(bedpan_to_disposal_distances)
+        if len(bedpan_to_disposal_distances) > 0
+        else bedpan_to_disposal_thresh
+    )
+
     return dict(
         robot_action=np.linalg.norm(action),
         bedpan_disorient=np.linalg.norm(bedpan_orient - np.array([0, 0, 0, 1])),
-        distance_bedpan_disposal=min(
-            env.bedpan.get_closest_points(env.disposal_bowl)[-1]
-        ),
+        distance_bedpan_disposal=distance_bedpan_disposal,
     )
 
 
