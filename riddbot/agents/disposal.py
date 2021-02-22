@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 import numpy as np
 import pybullet as p
@@ -19,3 +20,14 @@ class DisposalBowl(Agent):
         )
 
         super().init(disposal_bowl, env.id, env.np_random, indices=-1)
+
+    def set_original_pos_orient(self):
+        self.original_pos, self.original_orient = self.get_pos_orient(self.base)
+
+    @property
+    def pos_orient_perturbation(self) -> Tuple[float, float]:
+        curr_pos, curr_orient = self.get_pos_orient(self.base)
+        return (
+            np.linalg.norm(curr_pos - self.original_pos),
+            np.linalg.norm(curr_orient - self.original_orient),
+        )

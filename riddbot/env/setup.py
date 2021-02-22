@@ -162,6 +162,8 @@ def setup_sanitation_stand(env: AssistiveEnv):
     for _ in range(100):
         p.stepSimulation(physicsClientId=env.id)
 
+    env.disposal_bowl.set_original_pos_orient()
+
 
 def setup_gravity(env: AssistiveEnv):
     p.setGravity(0, 0, -9.81, physicsClientId=env.id)

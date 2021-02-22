@@ -8,6 +8,8 @@
         "bedpan_disorient": -0.5,
         "water_on_human": -4.0,
         "water_on_bed": -2.0,
+        "disposal_bowl_pos_perturbed": -1.5,
+        "disposal_bowl_orient_perturbed": -3.0,
         "distance_bedpan_human": 2.0,
         "water_in_sanitation_bowl": 10.0
     }

@@ -51,6 +51,13 @@ def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
 
 
 def get_sanitation_rewards(env: AssistiveEnv) -> dict:
+    (
+        disposal_bowl_pos_perturbed,
+        disposal_bowl_orient_perturbed,
+    ) = env.disposal_bowl.pos_orient_perturbation
+
     return dict(
-        water_in_sanitation_bowl=sum(w.is_inside_disposal_bowl for w in env.waters)
+        disposal_bowl_pos_perturbed=disposal_bowl_pos_perturbed,
+        disposal_bowl_orient_perturbed=disposal_bowl_orient_perturbed,
+        water_in_sanitation_bowl=sum(w.is_inside_disposal_bowl for w in env.waters),
     )
