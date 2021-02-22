@@ -5,10 +5,10 @@
     "reward_weights": {
         "human_preferences": 1.0,
         "robot_action": -0.8,
-        "bedpan_disorient": -0.01,
-        "distance_bedpan_human": 1.0,
+        "bedpan_disorient": -0.5,
         "water_on_human": -4.0,
         "water_on_bed": -2.0,
+        "distance_bedpan_human": 2.0,
         "water_in_sanitation_bowl": 10.0
     }
 }

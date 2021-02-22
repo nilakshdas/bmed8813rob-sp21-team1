@@ -44,7 +44,7 @@ def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
 
     _, bedpan_orient = env.bedpan.get_pos_orient(env.bedpan.base)
     rewards.update(
-        bedpan_disorient=np.sum(np.abs(bedpan_orient - np.array([0, 0, 0, 1])))
+        bedpan_disorient=np.linalg.norm(bedpan_orient - np.array([0, 0, 0, 1]))
     )
 
     return rewards
