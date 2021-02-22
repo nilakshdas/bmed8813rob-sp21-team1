@@ -12,7 +12,7 @@ from riddbot.env.bedpan_env import BedPanEnv
 from riddbot.env.setup import setup_camera
 
 ROBOT_ARM = "right"
-HUMAN_CONTROLLABLE_JOINT_INDICES = human.right_arm_joints
+HUMAN_CONTROLLABLE_JOINT_INDICES = []
 
 
 class BedPanJacoEnv(BedPanEnv):

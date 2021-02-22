@@ -5,20 +5,11 @@ from assistive_gym.envs.env import AssistiveEnv
 
 
 __all__ = [
-    "get_tool_observations",
     "get_robot_observations",
-    "get_human_observations",
+    "get_bedpan_observations",
+    "get_disposal_bowl_observations",
     "get_force_observations",
 ]
-
-
-def get_tool_observations(env: AssistiveEnv) -> Tuple[np.ndarray, np.ndarray]:
-    tool_pos, tool_orient = env.tool.get_pos_orient(1)
-    tool_pos_real, tool_orient_real = env.robot.convert_to_realworld(
-        tool_pos, tool_orient
-    )
-
-    return tool_pos_real, tool_orient_real
 
 
 def get_robot_observations(env: AssistiveEnv) -> np.ndarray:
@@ -36,32 +27,23 @@ def get_robot_observations(env: AssistiveEnv) -> np.ndarray:
     return robot_joint_angles
 
 
-def get_human_observations(
-    env: AssistiveEnv,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def get_bedpan_observations(env: AssistiveEnv) -> Tuple[np.ndarray, np.ndarray]:
+    bedpan_pos, bedpan_orient = env.bedpan.get_pos_orient(env.bedpan.base)
 
-    shoulder_pos = env.human.get_pos_orient(env.human.right_shoulder)[0]
-    elbow_pos = env.human.get_pos_orient(env.human.right_elbow)[0]
-    wrist_pos = env.human.get_pos_orient(env.human.right_wrist)[0]
+    bedpan_pos_real, bedpan_orient_real = env.robot.convert_to_realworld(
+        bedpan_pos, bedpan_orient
+    )
 
-    shoulder_pos_real, _ = env.robot.convert_to_realworld(shoulder_pos)
-    elbow_pos_real, _ = env.robot.convert_to_realworld(elbow_pos)
-    wrist_pos_real, _ = env.robot.convert_to_realworld(wrist_pos)
-
-    return shoulder_pos_real, elbow_pos_real, wrist_pos_real
+    return bedpan_pos_real, bedpan_orient_real
 
 
-def get_force_observations(
-    env: AssistiveEnv,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    total_force_on_human = np.sum(env.robot.get_contact_points(env.human)[-1])
-    tool_force = np.sum(env.tool.get_contact_points()[-1])
+def get_disposal_bowl_observations(env: AssistiveEnv) -> np.ndarray:
+    disposal_bowl_pos, _ = env.disposal_bowl.get_pos_orient(env.disposal_bowl.base)
+    disposal_bowl_pos_real, _ = env.robot.convert_to_realworld(disposal_bowl_pos)
+    return disposal_bowl_pos_real
 
-    tool_force_on_human = 0
-    new_contact_points = 0
-    for linkA, linkB, posA, posB, force in zip(*env.tool.get_contact_points(env.human)):
-        total_force_on_human += force
-        if linkA in [1]:
-            tool_force_on_human += force
 
-    return tool_force, tool_force_on_human, total_force_on_human, new_contact_points
+def get_force_observations(env: AssistiveEnv) -> Tuple[np.ndarray, np.ndarray]:
+    robot_force_on_human = np.sum(env.robot.get_contact_points(env.human)[-1])
+    bedpan_force_on_human = np.sum(env.bedpan.get_contact_points(env.human)[-1])
+    return robot_force_on_human, bedpan_force_on_human

@@ -62,19 +62,8 @@ def setup_bedpan(env: AssistiveEnv):
 
 
 def setup_robot(env: AssistiveEnv):
-    # Initialize the tool in the robot's gripper
-    env.tool.init(
-        env.robot,
-        env.task,
-        env.directory,
-        env.id,
-        env.np_random,
-        right=False,
-        mesh_scale=[1] * 3,
-    )
-
     # Initialize robot pose, get base position
-    target_ee_pos = np.array([-0.4, -0.2, 1.1])
+    target_ee_pos = np.array([-0.5, -0.2, 1.1])
     target_ee_orient = env.get_quaternion(env.robot.toc_ee_orient_rpy[env.task])
     bedpan_pos = env.bedpan.get_pos_orient(env.bedpan.base)[0]
 
@@ -84,9 +73,15 @@ def setup_robot(env: AssistiveEnv):
         [(target_ee_pos, target_ee_orient)],
         [(bedpan_pos, None)],
         arm="left",
-        tools=[env.tool],
         collision_objects=[env.human, env.furniture],
         wheelchair_enabled=False,
+    )
+
+    # Open gripper to hold the bedpan
+    env.robot.set_gripper_open_position(
+        env.robot.left_gripper_indices,
+        positions=[0.5] * 3,
+        set_instantly=True,
     )
 
     # Load a nightstand in the environment for mounted arms
@@ -96,13 +91,6 @@ def setup_robot(env: AssistiveEnv):
         env.nightstand.set_base_pos_orient(
             env.robot_base_position + np.array([-0.9, 0.7, 0]), [0, 0, 0, 1]
         )
-
-    # Open gripper to hold the tool
-    env.robot.set_gripper_open_position(
-        env.robot.left_gripper_indices,
-        env.robot.gripper_pos[env.task],
-        set_instantly=True,
-    )
 
 
 def setup_sanitation_stand(env: AssistiveEnv):
@@ -128,7 +116,6 @@ def setup_gravity(env: AssistiveEnv):
     if not env.robot.mobile:
         env.robot.set_gravity(0, 0, 0)
     env.human.set_gravity(0, 0, -1)
-    env.tool.set_gravity(0, 0, 0)
 
 
 def setup_camera(env: gym.Env):

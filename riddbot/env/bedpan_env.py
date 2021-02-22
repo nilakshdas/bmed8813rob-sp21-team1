@@ -15,12 +15,16 @@ class BedPanEnv(AssistiveEnv):
         if human.controllable:
             raise TypeError(human)
 
-        obs_robot_len = (
-            17
-            + len(robot.controllable_joint_indices)
-            - (len(robot.wheel_joint_indices) if robot.mobile else 0)
-        )
-        obs_human_len = 18 + len(human.controllable_joint_indices)
+        obs_robot_len = len(robot.controllable_joint_indices) - (
+            len(robot.wheel_joint_indices) if robot.mobile else 0
+        )  # robot_joint_angles
+        obs_robot_len += 3  # bedpan_pos
+        obs_robot_len += 4  # bedpan_orient
+        obs_robot_len += 3  # disposal_bowl_pos
+        obs_robot_len += 1  # robot_force_on_human
+        obs_robot_len += 1  # bedpan_force_on_human
+
+        obs_human_len = len(human.controllable_joint_indices)
 
         super().__init__(
             robot=robot,
@@ -34,26 +38,20 @@ class BedPanEnv(AssistiveEnv):
         if agent != "robot" and agent is not None:
             raise ValueError(agent)
 
-        tool_pos_real, tool_orient_real = get_tool_observations(self)
         robot_joint_angles = get_robot_observations(self)
-        shoulder_pos_real, elbow_pos_real, wrist_pos_real = get_human_observations(self)
+        bedpan_pos, bedpan_orient = get_bedpan_observations(self)
+        disposal_bowl_pos = get_disposal_bowl_observations(self)
+        robot_force_on_human, bedpan_force_on_human = get_force_observations(self)
 
-        (
-            self.tool_force,
-            self.tool_force_on_human,
-            self.total_force_on_human,
-            self.new_contact_points,
-        ) = get_force_observations(self)
+        self.total_force_on_human = robot_force_on_human + bedpan_force_on_human
 
         return np.concatenate(
             [
-                tool_pos_real,
-                tool_orient_real,
                 robot_joint_angles,
-                shoulder_pos_real,
-                elbow_pos_real,
-                wrist_pos_real,
-                [self.tool_force],
+                bedpan_pos,
+                bedpan_orient,
+                disposal_bowl_pos,
+                [robot_force_on_human, bedpan_force_on_human],
             ]
         ).ravel()
 
@@ -88,32 +86,16 @@ class BedPanEnv(AssistiveEnv):
         preferences_score = self.human_preferences(
             end_effector_velocity=end_effector_velocity,
             total_force_on_human=self.total_force_on_human,
-            tool_force_at_target=self.tool_force_on_human,
         )
 
-        reward_distance = -min(
-            self.tool.get_closest_points(self.human, distance=5.0)[-1]
-        )
         reward_action = -np.linalg.norm(action)  # Penalize actions
-        reward_new_contact_points = (
-            self.new_contact_points
-        )  # Reward new contact points on a person
+        reward_new_contact_points = 0  # Reward new contact points on a person
 
         reward = (
-            self.config("distance_weight") * reward_distance
-            + self.config("action_weight") * reward_action
+            self.config("action_weight") * reward_action
             + self.config("wiping_reward_weight") * reward_new_contact_points
             + preferences_score
         )
-
-        if self.gui and self.tool_force_on_human > 0:
-            print(
-                "Task success:",
-                self.task_success,
-                "Force at tool on human:",
-                self.tool_force_on_human,
-                reward_new_contact_points,
-            )
 
         info = {
             "total_force_on_human": self.total_force_on_human,
