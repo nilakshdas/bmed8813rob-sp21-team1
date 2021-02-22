@@ -2,6 +2,11 @@ JQ = jq --indent 4 -r
 PYENV_ROOT = $(HOME)/.pyenv
 POETRY = $(HOME)/.poetry/bin/poetry
 
+DOCKER_IMAGE_TAG = bmed8813rob-sp21-team1/riddbot:0.0.0
+DOCKER_VOLUMES = -v `bin`:`/workspace/bin` -v `configs`:`/workspace/configs` -v `riddbot`:`/workspace/riddbot`
+DOCKER_PORTS = -p 8265:8265
+DOCKER_MAKE = docker run $(DOCKER_VOLUMES) $(DOCKER_PORTS) $(DOCKER_IMAGE_TAG)
+
 
 .PHONY: clean_python
 clean_python:
@@ -10,6 +15,10 @@ clean_python:
 
 .PHONY: clean
 clean: clean_python clean_poetry
+
+.PHONY: docker_image
+docker_image:
+	docker build . -t $(DOCKER_IMAGE_TAG)
 
 $(PYENV_ROOT):
 	curl -sSL https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
@@ -51,3 +60,7 @@ jupyterlab_server: | .venv
 .PHONY: configs/%.json.train
 configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py $<
+
+.PHONY: configs/%.json.train_docker
+configs/%.json.train_docker: configs/%.json
+	$(DOCKER_MAKE) $<.train
