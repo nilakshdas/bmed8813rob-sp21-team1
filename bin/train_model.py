@@ -47,7 +47,7 @@ def main():
     with open(model_dir / "config.json", "w") as f:
         json.dump(config, f, indent=4)
 
-    env_name, env = make_env()
+    env_name, env = make_env(reward_weights=config["reward_weights"])
 
     train(
         env_name,
@@ -57,6 +57,7 @@ def main():
         load_policy_path=str(model_dir),
         seed=config["seed"],
         coop=False,
+        extra_configs=dict(env_config=dict(reward_weights=config["reward_weights"])),
     )
 
 

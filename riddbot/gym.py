@@ -16,26 +16,28 @@ HUMAN_CONTROLLABLE_JOINT_INDICES = []
 
 
 class BedPanJacoEnv(BedPanEnv):
-    def __init__(self):
+    def __init__(self, reward_weights: dict):
         super(BedPanJacoEnv, self).__init__(
             robot=Jaco(ROBOT_ARM),
             human=Human(HUMAN_CONTROLLABLE_JOINT_INDICES, controllable=False),
+            reward_weights=reward_weights,
         )
 
 
-def make_env() -> Tuple[str, gym.Env]:
+def make_env(reward_weights: dict) -> Tuple[str, gym.Env]:
     env_name = "BedPanJaco-v1"
-
-    assistive_gym.envs.BedPanJacoEnv = BedPanJacoEnv
-    register_ray("assistive_gym:" + env_name, lambda config: BedPanJacoEnv())
+    ray_name = "assistive_gym:" + env_name
 
     register_gym(
         id=env_name,
-        entry_point="assistive_gym.envs:" + BedPanJacoEnv.__name__,
+        entry_point="riddbot.gym:BedPanJacoEnv",
+        kwargs={"reward_weights": reward_weights},
         max_episode_steps=200,
     )
 
-    env = gym.make("assistive_gym:" + env_name)
+    register_ray(ray_name, lambda config: BedPanJacoEnv(**config))
+
+    env = gym.make(ray_name)
     setup_camera(env)
 
     return env_name, env

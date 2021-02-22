@@ -1,16 +1,16 @@
 import numpy as np
 import pybullet as p
-
 from assistive_gym.envs.env import AssistiveEnv
 from assistive_gym.envs.agents.human import Human
 from assistive_gym.envs.agents.robot import Robot
 
 from riddbot.env.observe import *
+from riddbot.env.rewards import *
 from riddbot.env.setup import *
 
 
 class BedPanEnv(AssistiveEnv):
-    def __init__(self, robot, human: Human):
+    def __init__(self, robot: Robot, human: Human, reward_weights: dict):
 
         if human.controllable:
             raise TypeError(human)
@@ -33,6 +33,8 @@ class BedPanEnv(AssistiveEnv):
             obs_robot_len=obs_robot_len,
             obs_human_len=obs_human_len,
         )
+
+        self.reward_weights = reward_weights
 
     def _get_obs(self, agent=None):
         if agent != "robot" and agent is not None:
@@ -80,22 +82,14 @@ class BedPanEnv(AssistiveEnv):
 
         obs = self._get_obs()
 
-        # Get human preferences
-        end_effector_velocity = np.linalg.norm(
-            self.robot.get_velocity(self.robot.left_end_effector)
-        )
-        preferences_score = self.human_preferences(
-            end_effector_velocity=end_effector_velocity,
-            total_force_on_human=self.total_force_on_human,
-        )
+        rewards_dict = dict()
+        rewards_dict.update(get_bed_rewards(self))
+        rewards_dict.update(get_human_rewards(self))
+        rewards_dict.update(get_robot_rewards(self, action))
+        rewards_dict.update(get_sanitation_rewards(self))
 
-        reward_action = -np.linalg.norm(action)  # Penalize actions
-        reward_new_contact_points = 0  # Reward new contact points on a person
-
-        reward = (
-            self.config("action_weight") * reward_action
-            + self.config("wiping_reward_weight") * reward_new_contact_points
-            + preferences_score
+        total_reward = sum(
+            self.reward_weights[k] * rewards_dict[k] for k in rewards_dict.keys()
         )
 
         info = {
@@ -105,7 +99,11 @@ class BedPanEnv(AssistiveEnv):
             "obs_robot_len": self.obs_robot_len,
             "obs_human_len": self.obs_human_len,
         }
+        info.update(rewards_dict)
 
-        done = self.iteration >= 200
+        done = (
+            rewards_dict["water_in_sanitation_bowl"] == len(self.waters)
+            or self.iteration >= 200
+        )
 
-        return obs, reward, done, info
+        return obs, total_reward, done, info
