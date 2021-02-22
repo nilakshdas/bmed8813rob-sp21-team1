@@ -15,39 +15,27 @@ def get_bed_rewards(env: AssistiveEnv) -> dict:
 
 
 def get_human_rewards(env: AssistiveEnv) -> dict:
-    rewards = dict()
-
     end_effector_velocity = np.linalg.norm(
         env.robot.get_velocity(env.robot.left_end_effector)
     )
 
-    rewards.update(
+    return dict(
         human_preferences=env.human_preferences(
             end_effector_velocity=end_effector_velocity,
             total_force_on_human=env.total_force_on_human,
-        )
+        ),
+        distance_bedpan_human=min(env.bedpan.get_closest_points(env.human)[-1]),
+        water_on_human=sum(w.is_on_human for w in env.waters),
     )
-
-    rewards.update(
-        distance_bedpan_human=min(env.bedpan.get_closest_points(env.human)[-1])
-    )
-
-    rewards.update(water_on_human=sum(w.is_on_human for w in env.waters))
-
-    return rewards
 
 
 def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
-    rewards = dict()
-
-    rewards.update(robot_action=np.linalg.norm(action))
-
     _, bedpan_orient = env.bedpan.get_pos_orient(env.bedpan.base)
-    rewards.update(
-        bedpan_disorient=np.linalg.norm(bedpan_orient - np.array([0, 0, 0, 1]))
-    )
 
-    return rewards
+    return dict(
+        robot_action=np.linalg.norm(action),
+        bedpan_disorient=np.linalg.norm(bedpan_orient - np.array([0, 0, 0, 1])),
+    )
 
 
 def get_sanitation_rewards(env: AssistiveEnv) -> dict:
