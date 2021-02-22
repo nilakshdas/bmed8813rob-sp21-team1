@@ -33,9 +33,9 @@ def get_robot_rewards(env: AssistiveEnv, action: np.ndarray) -> dict:
     _, bedpan_orient = env.bedpan.get_pos_orient(env.bedpan.base)
 
     bedpan_to_disposal_thresh = 20.0
-    _, _, _, bedpan_to_disposal_distances = env.bedpan.get_closest_points(
+    bedpan_to_disposal_distances = env.bedpan.get_closest_points(
         env.disposal_bowl, distance=bedpan_to_disposal_thresh
-    )
+    )[-1]
     distance_bedpan_disposal = (
         min(bedpan_to_disposal_distances)
         if len(bedpan_to_disposal_distances) > 0
