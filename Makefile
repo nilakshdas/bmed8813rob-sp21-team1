@@ -26,7 +26,7 @@ poetry: $(POETRY)
 	$(POETRY) $(ARGS)
 
 poetry.lock: pyproject.toml | $(POETRY)
-	$(POETRY) lock
+	$(POETRY) lock -vvv
 
 .venv: poetry.lock | $(POETRY)
 	$(POETRY) run pip install pip==21.0.1
@@ -44,6 +44,10 @@ clean_poetry:
 jupyterlab: | .venv
 	$(POETRY) run jupyter lab
 
+.PHONY: jupyterlab_server
+jupyterlab_server: | .venv
+	$(POETRY) run jupyter lab --no-browser --ip="0.0.0.0"
+
 .PHONY: configs/%.json.train
-configs/%.json.train: configs/%.json
+configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py $<
