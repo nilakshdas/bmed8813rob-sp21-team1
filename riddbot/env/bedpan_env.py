@@ -64,6 +64,7 @@ class BedPanEnv(AssistiveEnv):
         setup_bedpan(self)
         setup_robot(self)
         setup_sanitation_stand(self)
+        setup_waters(self)
 
         setup_gravity(self)
 

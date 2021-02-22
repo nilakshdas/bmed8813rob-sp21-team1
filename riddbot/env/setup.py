@@ -6,6 +6,7 @@ from assistive_gym.envs.agents.furniture import Furniture
 
 from riddbot.agents.bedpan import Bedpan
 from riddbot.agents.disposal import DisposalBowl
+from riddbot.agents.water import Water
 
 
 __all__ = [
@@ -13,6 +14,7 @@ __all__ = [
     "setup_patient",
     "setup_robot",
     "setup_bedpan",
+    "setup_waters",
     "setup_sanitation_stand",
     "setup_gravity",
 ]
@@ -61,6 +63,56 @@ def setup_bedpan(env: AssistiveEnv):
         p.stepSimulation(physicsClientId=env.id)
 
 
+def setup_waters(env: AssistiveEnv):
+    Water.set_env(env)
+
+    num_waters = 3
+    water_radius = 0.005
+    water_mass = 0.001
+
+    bedpan_pos = env.bedpan.get_pos_orient(env.bedpan.base)[0]
+
+    water_positions = []
+    for i in range(num_waters):
+        for j in range(num_waters):
+            for k in range(num_waters):
+                water_pos = bedpan_pos + np.array(
+                    [
+                        i * 2 * water_radius - 0.06,
+                        j * 2 * water_radius - 0.06,
+                        k * 2 * water_radius + 0.2,
+                    ]
+                )
+                water_positions.append(water_pos)
+
+    env.waters = Water.from_spheres(
+        env.create_spheres(
+            radius=water_radius,
+            mass=water_mass,
+            batch_positions=water_positions,
+            visual=False,
+            collision=True,
+        )
+    )
+
+    for w in env.waters:
+        p.changeVisualShape(
+            w.body, -1, rgbaColor=[0.25, 0.5, 1, 1], physicsClientId=env.id
+        )
+
+    #  Let the waters settle in the bedpan
+    p.setGravity(0, 0, -1, physicsClientId=env.id)
+    for _ in range(200):
+        p.stepSimulation(physicsClientId=env.id)
+
+    # Remove waters that may have got out of bedpan
+    waters_to_remove = [w for w in env.waters if not w.is_inside_bedpan]
+    env.waters = [w for w in env.waters if w not in waters_to_remove]
+    for w in waters_to_remove:
+        p.removeBody(w.body)
+    del waters_to_remove
+
+
 def setup_robot(env: AssistiveEnv):
     # Initialize robot pose, get base position
     target_ee_pos = np.array([-0.5, -0.2, 1.1])
@@ -80,7 +132,7 @@ def setup_robot(env: AssistiveEnv):
     # Open gripper to hold the bedpan
     env.robot.set_gripper_open_position(
         env.robot.left_gripper_indices,
-        positions=[0.5] * 3,
+        positions=[0.4] * 3,
         set_instantly=True,
     )
 
