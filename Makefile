@@ -29,7 +29,8 @@ poetry.lock: pyproject.toml | $(POETRY)
 	$(POETRY) lock
 
 .venv: poetry.lock | $(POETRY)
-	$(POETRY) install
+	$(POETRY) run pip install pip==21.0.1
+	$(POETRY) install -vvv
 
 .PHONY: python_deps
 python_deps: .venv
@@ -38,14 +39,6 @@ python_deps: .venv
 clean_poetry:
 	rm -rf .venv
 	rm -f poetry.lock
-
-.PHONY: lint_check
-lint_check: | .venv
-	$(POETRY) run black --check .
-
-.PHONY: lint
-lint: | .venv
-	$(POETRY) run black .
 
 .PHONY: jupyterlab
 jupyterlab: | .venv
