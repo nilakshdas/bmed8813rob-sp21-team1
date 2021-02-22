@@ -6,6 +6,8 @@ ifneq ($(CURRENT_PYTHON_VERSION),$(SUPPORTED_PYTHON_VERSION))
 endif
 
 
+JQ = jq --indent 4 -r
+PYENV_ROOT = $(HOME)/.pyenv
 POETRY = $(HOME)/.poetry/bin/poetry
 
 
@@ -16,6 +18,9 @@ clean_python:
 
 .PHONY: clean
 clean: clean_python clean_poetry
+
+$(PYENV_ROOT):
+	curl -sSL https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
 $(POETRY):
 	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
