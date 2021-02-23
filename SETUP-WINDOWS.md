@@ -14,5 +14,6 @@
 
 ## Run scripts
 1. `cd bmed8813rob-sp21-team1`
-2. `$env:PYTHONPATH += ";"+$HOME+"\bmed8813rob-sp21-team1"`
-3. `python bin/teleop.py`
+2. `$env:Path += ";"+$HOME+"\.pyenv\pyenv-win\versions\3.6.8"`
+3. `$env:PYTHONPATH += ";"+$HOME+"\bmed8813rob-sp21-team1"`
+4. `python bin/teleop.py`
