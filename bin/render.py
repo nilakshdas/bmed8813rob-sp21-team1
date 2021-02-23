@@ -22,7 +22,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def get_ckpt_path(model_path: Path) -> Path:
-    ckpt_path_glob = model_path.glob("*/*/checkpoint_*/checkpoint-*")
+    ckpt_path_glob = model_path.glob("*/*/checkpoint_*/checkpoint-*[!.tune_metadata]")
     ckpt_path = next(ckpt_path_glob).absolute()
     logger.info(f"Policy will be loaded from {ckpt_path}")
     return ckpt_path
