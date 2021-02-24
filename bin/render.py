@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import shutil
+from datetime import datetime
 from pathlib import Path
 
 from assistive_gym.learn import render_policy
@@ -18,6 +19,7 @@ def parse_args() -> argparse.Namespace:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-m", "--model_path", type=Path)
     group.add_argument("-c", "--config_path", type=Path)
+    parser.add_argument("-o", "--output_dir", type=Path)
     return parser.parse_args()
 
 
@@ -44,6 +46,8 @@ def main():
     else:
         ckpt_path = ""
         config_path = args.config_path.absolute()
+        if args.output_dir is None:
+            raise ValueError("--output_dir is required when --config_path is set")
 
     config = read_config(config_path)
 
@@ -59,10 +63,11 @@ def main():
         extra_configs=dict(env_config=dict(reward_weights=config["reward_weights"])),
     )
 
-    if args.model_path is not None:
-        new_filepath = (args.model_path / filename).absolute()
-        shutil.move(filename, new_filepath)
-        filename = new_filepath
+    output_dir = (args.output_dir or args.model_path).absolute()
+    nem_filename = "{}-{}".format(datetime.now().strftime("%Y%m%dT%H%M%S"), filename)
+    new_filepath = output_dir / nem_filename
+    shutil.move(filename, new_filepath)
+    filename = new_filepath
 
     logger.info(f"Rendered at {filename}")
 

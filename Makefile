@@ -55,6 +55,10 @@ jupyterlab_server: | .venv
 configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py $<
 
+.PHONY: configs/%.json.render
+configs/%.json.render: configs/%.json | .venv
+	$(POETRY) run python bin/render.py --config_path $< --output_dir out/
+
 .PHONY: riddbot/model_zoo/%/.render
 riddbot/model_zoo/%/.render: riddbot/model_zoo/%
 	$(POETRY) run python bin/render.py --model_path $<
