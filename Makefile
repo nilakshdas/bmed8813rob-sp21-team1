@@ -1,5 +1,6 @@
 JQ = jq --indent 4 -r
 PYENV_ROOT = $(HOME)/.pyenv
+PYENV = $(HOME)/.pyenv/bin/pyenv
 POETRY = $(HOME)/.poetry/bin/poetry
 
 
@@ -13,10 +14,11 @@ clean: clean_python clean_poetry
 
 $(PYENV_ROOT):
 	curl -sSL https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+	@echo && echo "Press any key to continue..." && read key
 
 .PHONY: pyenv
 pyenv: | $(PYENV_ROOT)
-	pyenv install
+	$(PYENV) install
 
 $(POETRY):
 	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
