@@ -114,12 +114,12 @@ def setup_waters(env: AssistiveEnv):
 
 
 def setup_robot(env: AssistiveEnv):
-    right_arm = True
+    right_arm = False
 
     # Initialize robot pose, get base position
-    target_ee_pos = np.array([-0.5, -0.2, 1.1])
-    target_ee_orient = env.get_quaternion(env.robot.toc_ee_orient_rpy[env.task])
     bedpan_pos = env.bedpan.get_pos_orient(env.bedpan.base)[0]
+    target_ee_pos = bedpan_pos
+    target_ee_orient = env.get_quaternion([0, 0, 0])
 
     env.robot_base_position = env.init_robot_pose(
         target_ee_pos,
@@ -162,7 +162,7 @@ def setup_robot(env: AssistiveEnv):
             )
 
     # Create constraint that keeps the bedpan in the gripper
-    robot_gripper_pos_offset = [0, 0, 0]
+    robot_gripper_pos_offset = [0, 0, 0.03]
     robot_gripper_orient_offset = [0, -np.pi / 2.0, 0]
     constraint = p.createConstraint(
         env.robot.body,
