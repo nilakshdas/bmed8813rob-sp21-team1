@@ -31,7 +31,7 @@ def setup_patient(env: AssistiveEnv):
     env.human.setup_joints(
         joints_positions, use_static_joints=False, reactive_force=None
     )
-    env.human.set_base_pos_orient([0.05, 0.2, 0.95], [-np.pi / 2.0, np.pi / 2.0, 0])
+    env.human.set_base_pos_orient([0.005, 0.2, 0.95], [-np.pi / 2.0, np.pi / 2.0, 0])
 
     # Let the person settle on the bed
     p.setGravity(0, 0, -1, physicsClientId=env.id)
@@ -138,7 +138,7 @@ def setup_robot(env: AssistiveEnv):
             if right_arm
             else env.robot.left_gripper_indices
         ),
-        positions=[0.4] * 3,
+        positions=[0.0] * 3,
         set_instantly=True,
     )
 
@@ -182,7 +182,7 @@ def setup_robot(env: AssistiveEnv):
 
 def setup_sanitation_stand(env: AssistiveEnv):
     robot_base_position = env.robot_base_position
-    sanitation_stand_pos = robot_base_position + np.array([-0.9, 0.1, 0])
+    sanitation_stand_pos = robot_base_position + np.array([-0.9, 0.04, 0])
     disposal_bowl_pos = sanitation_stand_pos + np.array([0, 0, 0.8])
 
     env.sanitation_stand = Furniture()
@@ -198,6 +198,22 @@ def setup_sanitation_stand(env: AssistiveEnv):
         p.stepSimulation(physicsClientId=env.id)
 
     env.disposal_bowl.set_original_pos_orient()
+
+    # Create constraint that keeps the disposal bowl on the nightstand
+    constraint = p.createConstraint(
+        env.sanitation_stand.body,
+        -1,
+        env.disposal_bowl.body,
+        -1,
+        p.JOINT_FIXED,
+        [0, 0, 0],
+        parentFramePosition=[0, 0, 0],
+        childFramePosition=[0, 0, 0],
+        parentFrameOrientation=[0, 0, 0, 1],
+        childFrameOrientation=[0, 0, 0, 1],
+        physicsClientId=env.id,
+    )
+    p.changeConstraint(constraint, maxForce=500, physicsClientId=env.id)
 
 
 def setup_gravity(env: AssistiveEnv):
