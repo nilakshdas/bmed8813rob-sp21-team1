@@ -59,6 +59,9 @@ configs/%_newseed.json: configs/%.json
 configs/%_t5M.json: configs/%.json
 	cat $< | $(JQ) '.train_timesteps = 5000000' > $@
 
+configs/%_t10M.json: configs/%.json
+	cat $< | $(JQ) '.train_timesteps = 10000000' > $@
+
 .PHONY: configs/%.json.train
 configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py --config_path $<
