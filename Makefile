@@ -3,6 +3,8 @@ PYENV_ROOT = $(HOME)/.pyenv
 PYENV = $(HOME)/.pyenv/bin/pyenv
 POETRY = $(HOME)/.poetry/bin/poetry
 
+RANDOM := $(shell python -c "import random; print(int(random.random() * 10000))")
+
 
 .PHONY: clean_python
 clean_python:
@@ -50,6 +52,9 @@ jupyterlab: | .venv
 .PHONY: jupyterlab_server
 jupyterlab_server: | .venv
 	$(POETRY) run jupyter lab --no-browser --ip="0.0.0.0"
+
+configs/%_newseed.json: configs/%.json
+	cat $< | $(JQ) '.seed = $(RANDOM)' > $@
 
 configs/%_t5M.json: configs/%.json
 	cat $< | $(JQ) '.train_timesteps = 5000000' > $@
