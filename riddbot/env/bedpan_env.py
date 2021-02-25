@@ -101,6 +101,6 @@ class BedPanEnv(AssistiveEnv):
         }
         info.update(rewards_dict)
 
-        done = self.iteration >= 200
+        done = self.iteration >= 200 or rewards_dict["water_in_bedpan"] == 0
 
         return obs, total_reward, done, info
