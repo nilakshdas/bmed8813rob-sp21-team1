@@ -66,9 +66,9 @@ def setup_bedpan(env: AssistiveEnv):
 def setup_waters(env: AssistiveEnv):
     Water.set_env(env)
 
-    num_waters = 3
+    num_waters = 4
     water_radius = 0.005
-    water_mass = 0.001
+    water_mass = 0.0001
 
     bedpan_pos = env.bedpan.get_pos_orient(env.bedpan.base)[0]
 
