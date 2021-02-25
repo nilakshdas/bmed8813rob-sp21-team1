@@ -61,7 +61,7 @@ configs/%_t5M.json: configs/%.json
 
 .PHONY: configs/%.json.train
 configs/%.json.train: configs/%.json | .venv
-	$(POETRY) run python bin/train_model.py $<
+	$(POETRY) run python bin/train_model.py --config_path $<
 
 .PHONY: configs/%.json.render
 configs/%.json.render: configs/%.json | .venv

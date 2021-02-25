@@ -18,7 +18,7 @@ MODEL_ZOO_DIR = Path(pkg_resources.resource_filename("riddbot", "model_zoo"))
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_path", type=Path)
+    parser.add_argument("-c", "--config_path", type=Path, required=True)
     return parser.parse_args()
 
 
