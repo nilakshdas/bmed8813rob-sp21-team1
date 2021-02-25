@@ -67,7 +67,7 @@ configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py --config_path $<
 
 .PHONY: configs/%.json.teleop
-configs/%.json.train: configs/%.json | .venv
+configs/%.json.teleop: configs/%.json | .venv
 	$(POETRY) run python bin/teleop.py --config_path $<
 
 .PHONY: configs/%.json.render
