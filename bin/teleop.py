@@ -1,3 +1,4 @@
+import argparse
 import sys
 import json
 from pathlib import Path
@@ -33,19 +34,27 @@ RPY_KEYS_ACTIONS = {
 }
 
 
-def read_config(config_path: str) -> dict:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config_path", type=Path, required=True)
+    return parser.parse_args()
+
+
+def read_config(config_path: Path) -> dict:
     with open(config_path, "r") as f:
         config = json.load(f)
     return config
 
 
-def setup_env():
-    config = read_config("configs/bedpan_v2.json")
+def setup_env(config_path: Path):
+    config = read_config(config_path)
     return make_env(reward_weights=config["reward_weights"])
 
 
 def main():
-    env_name, env = setup_env()
+    args = parse_args()
+
+    env_name, env = setup_env(args.config_path)
     env = gym.make(env_name)
     env.render()
     observation = env.reset()

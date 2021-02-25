@@ -63,6 +63,10 @@ configs/%_t5M.json: configs/%.json
 configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py --config_path $<
 
+.PHONY: configs/%.json.teleop
+configs/%.json.train: configs/%.json | .venv
+	$(POETRY) run python bin/teleop.py --config_path $<
+
 .PHONY: configs/%.json.render
 configs/%.json.render: configs/%.json | .venv
 	$(POETRY) run python bin/render.py --config_path $< --output_dir out/
