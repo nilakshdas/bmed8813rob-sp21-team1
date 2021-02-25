@@ -51,6 +51,9 @@ jupyterlab: | .venv
 jupyterlab_server: | .venv
 	$(POETRY) run jupyter lab --no-browser --ip="0.0.0.0"
 
+configs/%_t5M.json: configs/%.json
+	cat $< | $(JQ) '.train_timesteps = 5000000' > $@
+
 .PHONY: configs/%.json.train
 configs/%.json.train: configs/%.json | .venv
 	$(POETRY) run python bin/train_model.py $<
