@@ -114,6 +114,8 @@ def setup_waters(env: AssistiveEnv):
 
 
 def setup_robot(env: AssistiveEnv):
+    right_arm = True
+
     # Initialize robot pose, get base position
     target_ee_pos = np.array([-0.5, -0.2, 1.1])
     target_ee_orient = env.get_quaternion(env.robot.toc_ee_orient_rpy[env.task])
@@ -124,14 +126,18 @@ def setup_robot(env: AssistiveEnv):
         target_ee_orient,
         [(target_ee_pos, target_ee_orient)],
         [(bedpan_pos, None)],
-        arm="left",
+        arm="right" if right_arm else "left",
         collision_objects=[env.human, env.furniture],
         wheelchair_enabled=False,
     )
 
     # Open gripper to hold the bedpan
     env.robot.set_gripper_open_position(
-        env.robot.left_gripper_indices,
+        (
+            env.robot.right_gripper_indices
+            if right_arm
+            else env.robot.left_gripper_indices
+        ),
         positions=[0.4] * 3,
         set_instantly=True,
     )
@@ -143,6 +149,35 @@ def setup_robot(env: AssistiveEnv):
         env.nightstand.set_base_pos_orient(
             env.robot_base_position + np.array([-0.9, 0.7, 0]), [0, 0, 0, 1]
         )
+
+    # Disable collisions between the bedpan and robot
+    for j in (
+        env.robot.right_gripper_collision_indices
+        if right_arm
+        else env.robot.left_gripper_collision_indices
+    ):
+        for tj in env.bedpan.all_joint_indices + [env.bedpan.base]:
+            p.setCollisionFilterPair(
+                env.robot.body, env.bedpan.body, j, tj, False, physicsClientId=env.id
+            )
+
+    # Create constraint that keeps the bedpan in the gripper
+    robot_gripper_pos_offset = [0, 0, 0]
+    robot_gripper_orient_offset = [0, -np.pi / 2.0, 0]
+    constraint = p.createConstraint(
+        env.robot.body,
+        env.robot.right_tool_joint if right_arm else env.robot.left_tool_joint,
+        env.bedpan.body,
+        -1,
+        p.JOINT_FIXED,
+        [0, 0, 0],
+        parentFramePosition=robot_gripper_pos_offset,
+        childFramePosition=[0, 0, 0],
+        parentFrameOrientation=robot_gripper_orient_offset,
+        childFrameOrientation=[0, 0, 0, 1],
+        physicsClientId=env.id,
+    )
+    p.changeConstraint(constraint, maxForce=500, physicsClientId=env.id)
 
 
 def setup_sanitation_stand(env: AssistiveEnv):
